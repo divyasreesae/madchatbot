@@ -13,6 +13,7 @@ def getCredit(strg):
 def getClassesHistory(strg):
     data = getUserData()['users']
     user =Enumerable(data).where(lambda i:i['name'].find(strg.split()[0],0,len(i['name']))>0).first()
+    print(user['id'])
     nclasshistory = get_class_history(user['id'])
     return nclasshistory
 
@@ -30,17 +31,15 @@ def getresult(strg):
 ]
     trainer.train(conversation)
     try:
-        trainer.train(['credit','credit:'+ str(getCredit(strg))])
-        print(str(getCredit(strg)))
+        trainer.train(['credit',strg.split()[0] +"has" + str(getCredit(strg))])
     except:
         print("Variable x is not defined")
     try:
         trainer.train(['class history',str(getClassesHistory(strg))])
-        print(str(getClassesHistory(strg)))
     except:
         print("Variable x is not defined")
 
     response = bot.get_response(strg)
-    print(response)
+    
     return str(response)
     

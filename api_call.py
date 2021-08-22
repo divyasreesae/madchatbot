@@ -41,7 +41,7 @@ def get_class_history(userid):
 ecredit = ""
 def getCredit(strg):
     data = getUserData()['users']
-    print(Enumerable(data).where(lambda i:i['name'].find(str(strg).split()[0],0,len(i['name']))>0))
+    print(Enumerable(data).where(lambda i:i['name'].find(str(strg).split()[0])>0))
     user =Enumerable(data).where(lambda i:i['name'].find(str(strg).split()[0],0,len(i['name']))>0).first()
     print(user)
     ncredits = get_credits(user['id'])

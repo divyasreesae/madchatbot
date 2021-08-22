@@ -12,7 +12,7 @@ def home():
     
 @app.route("/get")
 def get_bot_response():
-    userText = 'Bhavana credit'
+    userText = request.args.get('msg')
     # userText = 'msg';request.form['msg']
     print(str(userText))
     res = getresult(str(userText))

@@ -1,6 +1,7 @@
 from http.client import HTTPConnection
 from base64 import b64encode
 import json 
+from py_linq import Enumerable
 BASE_URL = 'http://testing.makeadiff.in/api/v1'
 auth = ('api@makeadiff.in', 'temp-password')
 
@@ -36,3 +37,11 @@ def get_class_history(userid):
     result = res.read()
     data = json.loads(result)['data']['classes']
     return data
+
+ecredit = ""
+def getCredit(strg):
+    data = getUserData()['users']
+    user =Enumerable(data).where(lambda i:i['name'].find(str(strg).split()[0],0,len(i['name']))>0).first()
+    print(user)
+    ncredits = get_credits(user['id'])
+    return ncredits   

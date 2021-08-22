@@ -1,44 +1,40 @@
 from chatterbot.trainers import ListTrainer
 from chatterbot import ChatBot
 from flask import Flask, render_template, request, jsonify
-from api_call import getUserData,get_credits,get_class_history
+from api_call import getUserData,get_credits,get_class_history,getCredit
 from py_linq import Enumerable
 
-def getCredit(strg):
-    data = getUserData()['users']
-    user =Enumerable(data).where(lambda i:i['name'].find(strg.split()[0],0,len(i['name']))>0).first()
-    ncredits = get_credits(user['id'])
-    return ncredits
-
-def getClassesHistory(strg):
-    data = getUserData()['users']
-    user =Enumerable(data).where(lambda i:i['name'].find(strg.split()[0],0,len(i['name']))>0).first()
-    print(user['id'])
-    nclasshistory = get_class_history(user['id'])
-    return nclasshistory
 
 def getresult(strg):
-    bot = ChatBot("assistant")
+   
+    bot = ChatBot('assistant',
+            logic_adapters=[
+            {
+                'import_path': 'chatterbot.logic.SpecificResponseAdapter',
+                'input_text': 'Help me!',
+                'output_text': 'Ok, here is a link: http://chatterbot.rtfd.org'
+            },
+            {
+            'import_path': 'customadapter.CreditLogicAdapter'
+            },
+            {
+            'import_path': 'customadapter.ClassHistoryLogicAdapter'
+            },
+            {
+            'import_path': 'chatterbot.logic.BestMatch',
+            "statement_comparison_function": "chatterbot.comparisons.jaccard_similarity",
+            'default_response': 'I am sorry, but I do not understand.',
+            'maximum_similarity_threshold': 0.90
+            }
+           
+        ],
+            read_only = True,
+            preprocessors=['chatterbot.preprocessors.clean_whitespace',
+                        'chatterbot.preprocessors.unescape_html',
+                        'chatterbot.preprocessors.convert_to_ascii']
+                        )
     trainer = ListTrainer(bot)
-    conversation = [
-    "Hello",
-    "Hi there!",
-    "How are you doing?",
-    "I'm doing great.",
-    "That is good to hear",
-    "Thank you.",
-    "You're welcome."
-]
-    trainer.train(conversation)
-    try:
-        trainer.train(['credit',strg.split()[0] +"has" + str(getCredit(strg))])
-    except:
-        print("Variable x is not defined")
-    try:
-        trainer.train(['class history',str(getClassesHistory(strg))])
-    except:
-        print("Variable x is not defined")
-
+    trainer.train("chatterbot.corpus.english.greetings")
     response = bot.get_response(strg)
     
     return str(response)
